@@ -5,8 +5,10 @@ import './App.css';
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function fetchMoviesHandler() {
+    setIsLoading(true);
     const response = await fetch('https://swapi.py4e.com/api/films');
     const data = await response.json();
     const transformedMovies = data.results.map((movie) => {
@@ -18,6 +20,7 @@ function App() {
       };
     });
     setMovies(transformedMovies);
+    setIsLoading(false);
   }
   useEffect(() => {});
 
@@ -27,7 +30,9 @@ function App() {
         <button onClick={fetchMoviesHandler}>Fetch Movies</button>
       </section>
       <section>
-        <MoviesList movies={movies} />
+        {!isLoading && <MoviesList movies={movies} />}
+        {!isLoading && movies.length === 0 && <p>No Movies Found!</p>}
+        {isLoading && <p>Loading...</p>}
       </section>
     </React.Fragment>
   );
