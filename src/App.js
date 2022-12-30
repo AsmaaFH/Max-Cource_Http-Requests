@@ -14,27 +14,24 @@ function App() {
     setError(null);
     try {
       const response = await fetch(
-        'https://react-http-ffae2-default-rtdb.firebaseio.com//movies.json'
+        'https://react-http-ffae2-default-rtdb.firebaseio.com/movies.json'
       );
-      console.log(response);
 
       if (!response.ok) {
         throw new Error('Something Went Wrong!');
       }
       const data = await response.json();
+      console.log(data);
 
-      const transformedMovies = data.results.map((movie) => {
-        return {
-          id: movie.episode_id,
-          title: movie.title,
-          releaseDate: movie.release_date,
-          openingText: movie.opening_crawl,
-        };
-      });
-      setMovies(transformedMovies);
+      const loadedMovies = [];
+
+      for (let key in data) {
+        loadedMovies.push({ id: key, ...data[key] });
+      }
+
+      setMovies(loadedMovies);
     } catch (error) {
       setError(error.message);
-      console.log(error.message);
     }
 
     setIsLoading(false);
@@ -44,8 +41,19 @@ function App() {
     fetchMoviesHandler();
   }, []);
 
-  function addMovieHandler(movie) {
-    console.log(movie);
+  async function addMovieHandler(movie) {
+    const response = await fetch(
+      'https://react-http-ffae2-default-rtdb.firebaseio.com/movies.json',
+      {
+        method: 'POST',
+        body: JSON.stringify(movie),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
   }
 
   return (
